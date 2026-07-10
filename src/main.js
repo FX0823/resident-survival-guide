@@ -1,0 +1,63 @@
+/* ==========================================
+   main.js — 入口：绑定事件，启动应用 v2
+   ========================================== */
+
+(function () {
+  'use strict';
+
+  Renderer.init();
+
+  const { dom } = Renderer;
+
+  // 开始新游戏
+  dom['btn-new-game'].addEventListener('click', () => {
+    GameEngine.startNewGame();
+  });
+
+  // 继续游戏
+  dom['btn-continue'].addEventListener('click', () => {
+    GameEngine.continueGame();
+  });
+
+  // 画廊
+  dom['btn-gallery'].addEventListener('click', () => {
+    Renderer.showGallery();
+  });
+
+  // 游戏中返回主菜单
+  dom['btn-menu'].addEventListener('click', () => {
+    if (confirm('确定返回主菜单？当前进度已自动保存。')) {
+      Renderer.showTitleScreen();
+    }
+  });
+
+  // 梗结局 → 重新选择
+  dom['btn-joke-retry'].addEventListener('click', () => {
+    GameEngine.returnFromJokeEnding();
+  });
+
+  // 章节结算 → 返回主菜单
+  dom['btn-chapter-menu'].addEventListener('click', () => {
+    Renderer.showTitleScreen();
+  });
+
+  // 职业结局 → 返回主菜单
+  dom['btn-career-menu'].addEventListener('click', () => {
+    Renderer.showTitleScreen();
+  });
+
+  // 职业结局 → 查看收集
+  dom['btn-career-gallery'].addEventListener('click', () => {
+    Renderer.showGallery();
+  });
+
+  // 画廊 → 返回
+  dom['btn-gallery-back'].addEventListener('click', () => {
+    Renderer.showTitleScreen();
+  });
+
+  // 启动
+  Renderer.showTitleScreen();
+  console.log('🏥 规培生存指南 v2 已就绪');
+  console.log('  第一章 · 胸痛之夜');
+})();

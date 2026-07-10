@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>规培生存指南</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ====== 主菜单 ====== -->
+    <div id="title-screen">
+      <div class="title-area">
+        <div class="title-icon">🏥</div>
+        <h1>规培生存指南</h1>
+        <p class="subtitle">第一集 · 急诊科</p>
+        <p class="tagline">你能活过这个夜班吗？</p>
+      </div>
+      <div class="title-buttons">
+        <button id="btn-new-game" class="btn-primary">开始新游戏</button>
+        <button id="btn-continue" class="btn-secondary hidden">继续游戏</button>
+        <button id="btn-gallery" class="btn-ghost">📋 结局收集</button>
+      </div>
+      <p class="title-footer">医学生/规培生 专属幽默小游戏</p>
+    </div>
+
+    <!-- ====== 游戏画面 ====== -->
+    <div id="game-screen" class="hidden">
+      <div id="game-header">
+        <span id="scene-label">急诊科 · 第一夜</span>
+        <button id="btn-menu" class="btn-icon" title="返回主菜单">✕</button>
+      </div>
+      <div id="game-body">
+        <div id="scene-text"></div>
+        <div id="attr-hints"></div>
+      </div>
+      <div id="game-footer">
+        <div id="choices-container"></div>
+      </div>
+    </div>
+
+    <!-- ====== 梗结局覆盖层 ====== -->
+    <div id="joke-ending-screen" class="hidden">
+      <div class="ending-card joke">
+        <div id="joke-ending-icon" class="ending-icon"></div>
+        <h2 id="joke-ending-title"></h2>
+        <p id="joke-ending-text"></p>
+        <p id="joke-ending-hint" class="ending-hint"></p>
+        <p id="joke-ending-progress" class="ending-progress"></p>
+        <button id="btn-joke-retry" class="btn-primary">🔄 重新选择</button>
+      </div>
+    </div>
+
+    <!-- ====== 属性结局画面 ====== -->
+    <div id="property-ending-screen" class="hidden">
+      <div class="ending-card property">
+        <div id="prop-ending-icon" class="ending-icon"></div>
+        <h2 id="prop-ending-title"></h2>
+        <p id="prop-ending-text"></p>
+        <div id="prop-ending-attrs" class="ending-attrs"></div>
+        <div class="ending-actions">
+          <button id="btn-replay" class="btn-primary">🔄 再来一次</button>
+          <button id="btn-to-gallery" class="btn-secondary">📋 查看收集</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== 章节结算画面 ====== -->
+    <div id="chapter-complete-screen" class="hidden">
+      <div class="ending-card chapter">
+        <div id="chapter-outcome-icon" class="ending-icon"></div>
+        <h2 id="chapter-outcome-title"></h2>
+        <p id="chapter-outcome-text"></p>
+        <div id="chapter-stats" class="chapter-stats"></div>
+        <div id="chapter-career" class="chapter-career"></div>
+        <div class="ending-actions">
+          <button id="btn-chapter-menu" class="btn-primary">📋 返回主菜单</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== 职业结局画面 ====== -->
+    <div id="career-ending-screen" class="hidden">
+      <div class="ending-card career">
+        <div id="career-ending-icon" class="ending-icon"></div>
+        <h2 id="career-ending-title"></h2>
+        <p id="career-ending-text"></p>
+        <div id="career-ending-stats" class="chapter-career"></div>
+        <div class="ending-actions">
+          <button id="btn-career-menu" class="btn-primary">📋 返回主菜单</button>
+          <button id="btn-career-gallery" class="btn-secondary">📋 查看收集</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== 结局收集画廊 ====== -->
+    <div id="gallery-screen" class="hidden">
+      <div class="gallery-header">
+        <h2>📋 结局收集</h2>
+        <button id="btn-gallery-back" class="btn-icon">✕</button>
+      </div>
+      <div class="gallery-section">
+        <h3>🃏 梗结局</h3>
+        <div id="gallery-joke" class="gallery-grid"></div>
+      </div>
+      <div class="gallery-section">
+        <h3>📖 职业结局</h3>
+        <div id="gallery-career" class="gallery-grid"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 脚本：按依赖顺序加载 -->
+  <script src="src/data/characters.js"></script>
+  <script src="src/data/endings.js"></script>
+  <script src="src/data/career.js"></script>
+  <script src="src/data/chapter-1.js"></script>
+  <script src="src/storage.js"></script>
+  <script src="src/engine.js"></script>
+  <script src="src/renderer.js"></script>
+  <script src="src/main.js"></script>
+</body>
+</html>
