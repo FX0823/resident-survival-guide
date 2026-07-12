@@ -119,26 +119,7 @@ const chapter2 = {
       title: '回家',
       text: '你同意了家属的说法——先观察。\n\n半小时后老人说"好一点了"。妻子说"那我们先回去，明天再来看门诊"。\n\n你开了胃药。让他们走了。\n\n凌晨五点。电话响了。\n\n"医生——刚才那个胃疼的老头——家属打电话来说他在家晕倒了——"\n\n你的手指停在键盘上。',
       choices: [
-        { text: '"打120让他们马上回来——不，直接送抢救室。"', next: 'scene_old_man_crash', attr: { 体力: -5, 专业度: -10 } },
-      ],
-    },
-
-    scene_old_man_crash: {
-      id: 'scene_old_man_crash',
-      title: '抢救',
-      text: '老人被120送回来。\n\n心电图——广泛前壁心梗。比几个小时前严重得多。导管室紧急启动。\n\n命救回来了。但心肌损伤面积——因为延误的这几个小时——大了不止一倍。\n\n主任翻完病历。沉默了很久。\n\n"你觉得胃病——他老婆也觉得是胃病——你们都同意。但你是医生。你的职责不是同意——是判断。"',
-      choices: [
-        { text: '无话可说。', next: 'scene_debrief_mistake', attr: { 专业度: -5 } },
-        { text: '"我的错。我不该被家属带偏。"', next: 'scene_debrief_mistake', attr: { 专业度: -3 } },
-      ],
-    },
-
-    scene_debrief_mistake: {
-      id: 'scene_debrief_mistake',
-      title: '代价',
-      text: '交班记录上留下了这次误判的痕迹。\n\n不是每一次"胃病"都是胃病。不是每一次家属说"没事"就真的没事。\n\n你学到了——但这个代价太大了。\n\n（第二章 · 完 — 重大失误结局）',
-      choices: [
-        { text: '合上记录。这份记录你会记住很久。', next: 'scene_chapter_end', isChapterEnd: true },
+        { text: '来不及了。', fatalEnding: 'ch1_gastric_home' },
       ],
     },
 
@@ -191,9 +172,9 @@ const chapter2 = {
     scene_young_sent_home: {
       id: 'scene_young_sent_home',
       title: '出事',
-      text: '他们走了。\n\n两小时后——救护车又把他们送回来了。\n\n头痛加重。喷射性呕吐。血压飙升。急诊CT——蛛网膜下腔少量出血。\n\n不是偏头痛。是动脉瘤的哨兵出血——第一次的头痛是警告，第二次才是灾难。\n\n她没死在第二次。因为第二次你抓住了。但第一次——你放走了她。\n\n主任说："急性头痛——不做CT不能回家。记住。"',
+      text: '他们走了。\n\n两小时后——救护车又把他们送回来了。\n\n头痛加重。喷射性呕吐。血压飙升。急诊CT——蛛网膜下腔少量出血。\n\n不是偏头痛。是动脉瘤的哨兵出血——第一次的头痛是警告，第二次才是灾难。\n\n开颅手术做了七个小时。她活下来了。但留下了永久性损伤。三十四岁。\n\n家属起诉了。律师在法庭上问——\n\n"急性剧烈头痛伴呕吐——为什么不建议做CT？"\n\n你没法回答。因为你也觉得——她不像脑出血。',
       choices: [
-        { text: '记住了。这个教训会刻在骨头里。', next: 'scene_debrief_mistake', attr: { 专业度: -8, 体力: -5 } },
+        { text: '你没法再选了。', fatalEnding: 'ch2_sah_miss' },
       ],
     },
 
