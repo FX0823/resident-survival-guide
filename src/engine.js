@@ -49,6 +49,7 @@ const GameEngine = {
     this.state.previousScene = null;
     this.state._skipDecay = false;
     this.state.chapterStats = { goodChoices: 0, badChoices: 0, fatalMistake: false };
+    this._finishChapterCalled = false;
     Storage.save(this.state);
     Renderer.showGameScreen();
     this.loadCurrentScene();
@@ -124,13 +125,8 @@ const GameEngine = {
     if (choice.fatalEnding) {
       this.state.chapterStats.fatalMistake = true;
       this.state.screen = 'failEnding';
-      this.saveAttributes();
-      Career.recordChapter(this.state.chapterId, {
-        correctChoices: this.state.chapterStats.goodChoices || 0,
-        badChoices: this.state.chapterStats.badChoices || 0,
-        majorMistake: true,
-      });
-      Storage.save(this.state);
+      // 统一走 finishChapter 记录成绩
+      this.finishChapter();
       Renderer.showChapterFailEnding(Endings.getChapterFailEnding(choice.fatalEnding));
       return;
     }
@@ -160,30 +156,36 @@ const GameEngine = {
     this.loadCurrentScene();
   },
 
-  // ===== 章节结算 =====
+  // ===== 章节结算（只调用一次！）=====
+  _finishChapterCalled: false,
   finishChapter() {
+    if (this._finishChapterCalled) return; // 防止重复调用
+    this._finishChapterCalled = true;
+
     this.saveAttributes();
 
     const cs = this.state.chapterStats;
-    let outcome = cs.fatalMistake ? 'fatal' : (cs.badChoices >= 2 ? 'nearMiss' : 'success');
-    let majorMistake = cs.fatalMistake;
+    const majorMistake = cs.fatalMistake;
 
     Career.recordChapter(this.state.chapterId, {
       correctChoices: cs.goodChoices || 0,
       badChoices: cs.badChoices || 0,
       majorMistake: majorMistake,
-      nearMiss: outcome === 'nearMiss',
+      nearMiss: !majorMistake && cs.badChoices >= 2,
     });
 
-    // 每章结束体力自然衰减（疲劳累积）
-    const careerStats = Career.getStats();
-    const chaptersDone = careerStats.chaptersCompleted.length;
-    if (chaptersDone >= 1) {
-      this.state.attributes.体力 = Math.max(0, this.state.attributes.体力 - 10);
-      this.saveAttributes();
+    // 致命结局 → 不检查后续，直接返回
+    if (majorMistake) {
+      return;
     }
 
-    // 检查累计结局（按优先级）
+    // 每章结束体力自然衰减
+    this.state.attributes.体力 = Math.max(0, this.state.attributes.体力 - 10);
+    this.saveAttributes();
+
+    const careerStats = Career.getStats();
+
+    // 累计结局检查（按优先级）
     if (this.state.attributes.体力 < 20) {
       this.state.screen = 'cumulativeEnding';
       Storage.save(this.state);
@@ -198,7 +200,7 @@ const GameEngine = {
       return;
     }
 
-    // 晋级检查：成功救治 ≥ 10
+    // 晋级检查
     if (careerStats.patientsSaved >= 10) {
       this.state.screen = 'promotionEnding';
       Storage.save(this.state);
@@ -206,7 +208,8 @@ const GameEngine = {
       return;
     }
 
-    // 正常章节结算
+    // 正常结算
+    const outcome = cs.badChoices >= 2 ? 'nearMiss' : 'success';
     this.state.screen = 'chapterComplete';
     Storage.save(this.state);
     Renderer.showChapterComplete(outcome, this.state.attributes, Career.getStats());

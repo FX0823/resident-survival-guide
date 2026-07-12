@@ -36,13 +36,14 @@ const Career = {
 
   /** 一章结束后记录成绩——同一章只记录首次完成，防重玩刷数据 */
   recordChapter(chapterId, chapterStats) {
+    // 确保 chaptersCompleted 是数组
+    if (!Array.isArray(this.stats.chaptersCompleted)) {
+      this.stats.chaptersCompleted = [];
+    }
+
+    // 同一章已完成过 → 不重复计数，只可能更新声誉
     if (this.stats.chaptersCompleted.includes(chapterId)) {
-      // 重玩：只更新声誉（取最好的一次），不增加患者计数
-      if (chapterStats.majorMistake) {
-        // 不覆盖之前的更好成绩
-      } else if (chapterStats.nearMiss) {
-        if (this.stats.reputation < 50) this.stats.reputation = 50;
-      } else {
+      if (!chapterStats.majorMistake && !chapterStats.nearMiss) {
         if (this.stats.reputation < 70) this.stats.reputation = 70;
       }
       this.save();
