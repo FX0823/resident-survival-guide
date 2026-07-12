@@ -13,7 +13,7 @@ const Renderer = {
       'chapter-complete-screen', 'gallery-screen',
       'fail-ending-screen', 'cumulative-ending-screen',
       'promotion-ending-screen',
-      'btn-start', 'btn-continue', 'btn-gallery', 'ch-unlock-hint',
+      'btn-start', 'btn-continue', 'btn-gallery', 'ch-unlock-hint', 'btn-reset',
       'btn-menu', 'btn-joke-retry', 'btn-gallery-back',
       'btn-chapter-menu', 'btn-fail-menu', 'btn-cum-menu', 'btn-promo-menu',
       'scene-label', 'scene-text', 'attr-hints', 'choices-container',

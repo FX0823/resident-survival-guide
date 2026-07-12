@@ -106,6 +106,20 @@ body {
   margin-bottom: 32px;
 }
 
+.btn-reset {
+  display: block;
+  margin: 24px auto 0;
+  padding: 8px 16px;
+  background: transparent;
+  color: #999;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font-main);
+}
+.btn-reset:hover { color: var(--accent); border-color: var(--accent); }
+
 .section-label {
   font-size: 13px;
   color: var(--text-light);

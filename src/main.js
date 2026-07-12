@@ -29,6 +29,13 @@
     GameEngine.continueGame();
   });
 
+  // 重置数据
+  dom['btn-reset'].addEventListener('click', () => {
+    if (confirm('确定重置全部数据？所有存档和进度都会被清空。')) {
+      Storage.clear(); Storage.clearCareer(); location.reload();
+    }
+  });
+
   // 画廊
   dom['btn-gallery'].addEventListener('click', () => {
     Renderer.showGallery();
