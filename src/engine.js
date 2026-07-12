@@ -75,13 +75,10 @@ const GameEngine = {
     this.loadCurrentScene();
   },
 
-  // ===== 加载场景 =====
+  // ===== 加载场景（不再自动扣体力——体力只由关键选择决定）=====
   loadCurrentScene() {
     const scene = this.state.chapter.scenes[this.state.currentScene];
     if (!scene) { console.error('找不到场景:', this.state.currentScene); return; }
-    if (this.state.history.length > 0 && !this.state._skipDecay) {
-      this.state.attributes.体力 = Math.max(0, this.state.attributes.体力 - 2);
-    }
     this.state._skipDecay = false;
     Renderer.showScene(scene, this.state.attributes);
   },
@@ -179,8 +176,8 @@ const GameEngine = {
       return;
     }
 
-    // 每章结束体力自然衰减
-    this.state.attributes.体力 = Math.max(0, this.state.attributes.体力 - 10);
+    // 每章结束体力小幅衰减
+    this.state.attributes.体力 = Math.max(0, this.state.attributes.体力 - 5);
     this.saveAttributes();
 
     const careerStats = Career.getStats();
