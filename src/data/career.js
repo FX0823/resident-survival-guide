@@ -33,8 +33,21 @@ const Career = {
     }
   },
 
-  /** 一章结束后记录成绩 */
+  /** 一章结束后记录成绩——同一章只记录首次完成，防重玩刷数据 */
   recordChapter(chapterId, chapterStats) {
+    if (this.stats.chaptersCompleted.includes(chapterId)) {
+      // 重玩：只更新声誉（取最好的一次），不增加患者计数
+      if (chapterStats.majorMistake) {
+        // 不覆盖之前的更好成绩
+      } else if (chapterStats.nearMiss) {
+        if (this.stats.reputation < 50) this.stats.reputation = 50;
+      } else {
+        if (this.stats.reputation < 70) this.stats.reputation = 70;
+      }
+      this.save();
+      return;
+    }
+
     this.stats.totalPatients++;
     this.stats.totalCorrectChoices += chapterStats.correctChoices || 0;
     this.stats.totalBadChoices += chapterStats.badChoices || 0;

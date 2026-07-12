@@ -9,13 +9,19 @@
 
   const { dom } = Renderer;
 
-  // 章节选择
-  dom['btn-ch1'].addEventListener('click', () => {
-    GameEngine.startChapter('ch1');
-  });
-
-  dom['btn-ch2'].addEventListener('click', () => {
-    GameEngine.startChapter('ch2');
+  // 开始游戏——自动判断该玩哪一章
+  dom['btn-start'].addEventListener('click', () => {
+    Career.init();
+    const done = Career.getStats().chaptersCompleted || [];
+    if (done.length === 0 || done.includes('ch2')) {
+      // 新手或全部通关 → 从第一章开始
+      GameEngine.startChapter('ch1');
+    } else if (done.includes('ch1') && !done.includes('ch2')) {
+      // 第一章过了 → 第二章
+      GameEngine.startChapter('ch2');
+    } else {
+      GameEngine.startChapter('ch1');
+    }
   });
 
   // 继续游戏

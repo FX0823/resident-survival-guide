@@ -12,7 +12,7 @@ const Renderer = {
       'title-screen', 'game-screen', 'joke-ending-screen',
       'property-ending-screen', 'chapter-complete-screen',
       'career-ending-screen', 'gallery-screen',
-      'btn-ch1', 'btn-ch2', 'btn-continue', 'btn-gallery',
+      'btn-start', 'btn-continue', 'btn-gallery', 'ch-unlock-hint',
       'btn-menu', 'btn-joke-retry', 'btn-replay', 'btn-to-gallery',
       'btn-gallery-back', 'btn-chapter-menu',
       'btn-career-menu', 'btn-career-gallery',
@@ -45,10 +45,24 @@ const Renderer = {
 
   showTitleScreen() {
     this.showScreen('title-screen');
+
     if (Storage.hasSave()) {
       this.dom['btn-continue'].classList.remove('hidden');
     } else {
       this.dom['btn-continue'].classList.add('hidden');
+    }
+
+    Career.init();
+    const done = Career.getStats().chaptersCompleted || [];
+    if (done.length === 0) {
+      this.dom['ch-unlock-hint'].textContent = '';
+      this.dom['btn-start'].textContent = '开始游戏';
+    } else if (done.includes('ch1') && !done.includes('ch2')) {
+      this.dom['ch-unlock-hint'].textContent = '✅ 第一章已通过 — 第二章已解锁';
+      this.dom['btn-start'].textContent = '开始第二章';
+    } else if (done.includes('ch2')) {
+      this.dom['ch-unlock-hint'].textContent = '✅ 全部通关';
+      this.dom['btn-start'].textContent = '重新开始';
     }
   },
 
