@@ -12,11 +12,12 @@ const Renderer = {
       'title-screen', 'game-screen', 'joke-ending-screen',
       'chapter-complete-screen', 'gallery-screen',
       'fail-ending-screen', 'cumulative-ending-screen',
-      'promotion-ending-screen',
+      'promotion-ending-screen', 'yinao-screen',
       'btn-start', 'btn-continue', 'btn-gallery', 'ch-unlock-hint', 'btn-reset',
       'ch-select', 'btn-replay-ch1', 'btn-replay-ch2',
       'btn-menu', 'btn-joke-retry', 'btn-gallery-back',
       'btn-chapter-menu', 'btn-fail-retry', 'btn-fail-menu', 'btn-cum-menu', 'btn-promo-menu',
+      'btn-yinao-continue', 'yinao-text',
       'scene-label', 'scene-text', 'attr-hints', 'choices-container',
       'joke-ending-icon', 'joke-ending-title', 'joke-ending-text',
       'joke-ending-hint', 'joke-ending-progress',
@@ -38,7 +39,7 @@ const Renderer = {
     ['title-screen', 'game-screen', 'joke-ending-screen',
      'chapter-complete-screen', 'gallery-screen',
      'fail-ending-screen', 'cumulative-ending-screen',
-     'promotion-ending-screen'].forEach(id => {
+     'promotion-ending-screen', 'yinao-screen'].forEach(id => {
       this.dom[id].classList.add('hidden');
     });
     const target = document.getElementById(screenId);
@@ -132,7 +133,7 @@ const Renderer = {
 
     this.dom['chapter-stats'].innerHTML = [
       { label: '专业度', value: attributes.专业度 },
-      { label: '人缘', value: attributes.人缘 },
+      { label: '满意度', value: attributes.满意度 },
       { label: '体力', value: attributes.体力 },
     ].map(a => `<span class="attr-badge">${a.label}：${a.value}</span>`).join('');
 
@@ -166,6 +167,22 @@ const Renderer = {
       </p>`;
 
     this.showScreen('career-ending-screen');
+  },
+
+  // ===== 医闹事件 =====
+  showYiNao(attributes) {
+    const s = attributes.满意度;
+    let text = '家属在走廊里大声嚷嚷了起来。\n\n';
+    if (s < 30) {
+      text += '"这个医生什么态度！会不会看病！"\n\n周围几个候诊的人都看了过来。护士赶紧过来劝。\n\n你感到脸上发烫。';
+    } else if (s < 50) {
+      text += '"我们等了这么久——就这样打发我们？"\n\n家属的声音越来越大。旁边的病人开始窃窃私语。\n\n护士小林给你使了个眼色——意思是注意态度。';
+    } else {
+      text += '"医生——你能不能好好听我们说话？"\n\n家属的语气不太对。虽然还没到闹的程度——但已经很近了。';
+    }
+    text += '\n\n（患者满意度低于60——你在本章的沟通方式已经引发了不满。继续扣下去可能触发放走病人或投诉结局。）';
+    this.dom['yinao-text'].textContent = text;
+    this.showScreen('yinao-screen');
   },
 
   // ===== 章节失败结局 =====

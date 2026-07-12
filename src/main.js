@@ -52,6 +52,11 @@
   dom['btn-replay-ch1'].addEventListener('click', () => { GameEngine.startChapter('ch1'); });
   dom['btn-replay-ch2'].addEventListener('click', () => { GameEngine.startChapter('ch2'); });
 
+  // 医闹 → 继续
+  dom['btn-yinao-continue'].addEventListener('click', () => {
+    GameEngine.continueAfterYiNao();
+  });
+
   // 失败结局 → 重试本章
   dom['btn-fail-retry'].addEventListener('click', () => {
     GameEngine.startChapter(GameEngine.state.chapterId || 'ch1');

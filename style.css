@@ -327,6 +327,11 @@ body {
   border-top: 4px solid #8e44ad;
 }
 
+.ending-card.yinao {
+  border-top: 4px solid #e67e22;
+  background: #fffaf5;
+}
+
 .ending-card.fail {
   border-top: 4px solid #c0392b;
   background: #fef5f5;

@@ -11,14 +11,14 @@ const GameEngine = {
     chapterId: null,
     chapter: null,
     currentScene: null,
-    attributes: { 专业度: 50, 人缘: 50, 体力: 80, 运气: 40 },
+    attributes: { 专业度: 50, 满意度: 50, 体力: 80, 运气: 40 },
     history: [],
     jokeEndingsSeen: [],
     previousScene: null,
     _skipDecay: false,
     chapterStats: { goodChoices: 0, badChoices: 0, fatalMistake: false },
-    // 路径标记：不同选择留下印记，后续场景根据标记显示不同内容
     pathFlags: {},
+    _yiNaoTriggered: false,  // 本章是否已触发医闹
   },
 
   // ===== 从 career 加载跨章属性 =====
@@ -28,7 +28,7 @@ const GameEngine = {
     if (s.attributes) {
       this.state.attributes = Object.assign({}, s.attributes);
     } else {
-      this.state.attributes = { 专业度: 50, 人缘: 50, 体力: 80, 运气: 40 };
+      this.state.attributes = { 专业度: 50, 满意度: 50, 体力: 80, 运气: 40 };
     }
   },
 
@@ -52,6 +52,7 @@ const GameEngine = {
     this.state._skipDecay = false;
     this.state.chapterStats = { goodChoices: 0, badChoices: 0, fatalMistake: false };
     this.state.pathFlags = {};
+    this.state._yiNaoTriggered = false;
     this._finishChapterCalled = false;
     Storage.save(this.state);
     Renderer.showGameScreen();
@@ -66,7 +67,7 @@ const GameEngine = {
     const ch = this.chapters[saved.chapterId] || chapter1;
     this.state.chapterId = saved.chapterId;
     this.state.chapter = ch;
-    this.state.attributes = saved.attributes || { 专业度: 50, 人缘: 50, 体力: 80, 运气: 40 };
+    this.state.attributes = saved.attributes || { 专业度: 50, 满意度: 50, 体力: 80, 运气: 40 };
     this.state.history = saved.history || [];
     this.state.currentScene = saved.currentScene;
     this.state.screen = 'game';
@@ -134,6 +135,16 @@ const GameEngine = {
     if (choice.quality === 'bad') this.state.chapterStats.badChoices++;
     if (choice.setFlag) Object.assign(this.state.pathFlags, choice.setFlag);
 
+    // ★ 医闹触发：满意度跌破60且本章未触发过
+    if (this.state.attributes.满意度 < 60 && !this.state._yiNaoTriggered &&
+        !choice.fatalEnding && !choice.jokeEnding && !choice.isChapterEnd) {
+      this.state._yiNaoTriggered = true;
+      this._yiNaoPendingNext = choice.next; // 存下原本要去的地方
+      Storage.save(this.state);
+      Renderer.showYiNao(this.state.attributes);
+      return;
+    }
+
     // 标记路由：根据 flag 决定下一个场景
     let nextScene = choice.next;
     if (choice.routeByFlag) {
@@ -180,6 +191,18 @@ const GameEngine = {
     if (nextScene) {
       this.state.currentScene = nextScene;
       Storage.save(this.state);
+      this.loadCurrentScene();
+    }
+  },
+
+  // ===== 医闹后继续 =====
+  continueAfterYiNao() {
+    if (this._yiNaoPendingNext) {
+      const next = this._yiNaoPendingNext;
+      this._yiNaoPendingNext = null;
+      this.state.currentScene = next;
+      this.state.screen = 'game';
+      Renderer.showGameScreen();
       this.loadCurrentScene();
     }
   },
@@ -261,7 +284,8 @@ const GameEngine = {
     if (a.体力 < 25) hints.push('😵 你很累了——眼睛发虚，腿在抖');
     else if (a.体力 < 40) hints.push('🥱 体力在下降');
     if (a.专业度 >= 70) hints.push('📋 临床判断在线');
-    if (a.人缘 <= 25) hints.push('😐 你感觉和团队有些疏远');
+    if (a.满意度 <= 40) hints.push('😐 病人和家属的脸色不太好看');
+    else if (a.满意度 <= 60) hints.push('🤝 沟通还算顺畅——但要注意语气');
     return hints;
   },
 };

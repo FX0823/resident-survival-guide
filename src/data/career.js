@@ -19,7 +19,7 @@ const Career = {
       rank: '规培医生 第一年',
       chaptersCompleted: [],
       careerEndingsSeen: [],
-      attributes: { 专业度: 50, 人缘: 50, 体力: 80, 运气: 40 },
+      attributes: { 专业度: 50, 满意度: 50, 体力: 80, 运气: 40 },
     };
   },
 
