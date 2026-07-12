@@ -1,15 +1,10 @@
 /* ==========================================
-   engine.js — 游戏核心状态机 v2
-   章节制 + 职业追踪 + 属性 + 结局
+   engine.js v3 — 致命选项 + 属性跨章 + 累计结局
    ========================================== */
 
 const GameEngine = {
 
-  // 章节注册表
-  chapters: {
-    ch1: chapter1,
-    ch2: chapter2,
-  },
+  chapters: { ch1: chapter1, ch2: chapter2 },
 
   state: {
     screen: 'title',
@@ -19,32 +14,41 @@ const GameEngine = {
     attributes: { 专业度: 50, 人缘: 50, 体力: 80, 运气: 40 },
     history: [],
     jokeEndingsSeen: [],
-    propertyEndingsSeen: [],
-    careerEndingsSeen: [],
     previousScene: null,
     _skipDecay: false,
-    chapterStats: {
-      goodChoices: 0,
-      badChoices: 0,
-      visitedCrisis: false,
-      visitedHesitation: false,
-    },
+    chapterStats: { goodChoices: 0, badChoices: 0, fatalMistake: false },
   },
 
-  // ===== 开始指定章节 =====
+  // ===== 从 career 加载跨章属性 =====
+  loadAttributes() {
+    Career.init();
+    const s = Career.getStats();
+    if (s.attributes) {
+      this.state.attributes = Object.assign({}, s.attributes);
+    } else {
+      this.state.attributes = { 专业度: 50, 人缘: 50, 体力: 80, 运气: 40 };
+    }
+  },
+
+  saveAttributes() {
+    Career.getStats().attributes = Object.assign({}, this.state.attributes);
+    Career.save();
+  },
+
+  // ===== 开始章节 =====
   startChapter(chapterId) {
     Career.init();
     const ch = this.chapters[chapterId];
     if (!ch) { console.error('章节不存在:', chapterId); return; }
     this.state.chapterId = chapterId;
     this.state.chapter = ch;
-    this.state.attributes = { 专业度: 50, 人缘: 50, 体力: 80, 运气: 40 };
+    this.loadAttributes();
     this.state.history = [];
     this.state.currentScene = ch.initialScene;
     this.state.screen = 'game';
     this.state.previousScene = null;
     this.state._skipDecay = false;
-    this.state.chapterStats = { goodChoices: 0, badChoices: 0, visitedCrisis: false, visitedHesitation: false };
+    this.state.chapterStats = { goodChoices: 0, badChoices: 0, fatalMistake: false };
     Storage.save(this.state);
     Renderer.showGameScreen();
     this.loadCurrentScene();
@@ -53,24 +57,19 @@ const GameEngine = {
   // ===== 继续游戏 =====
   continueGame() {
     const saved = Storage.load();
-    if (!saved || !saved.chapterId) {
-      this.startChapter('ch1');
-      return;
-    }
+    if (!saved || !saved.chapterId) { this.startChapter('ch1'); return; }
     Career.init();
     const ch = this.chapters[saved.chapterId] || chapter1;
     this.state.chapterId = saved.chapterId;
     this.state.chapter = ch;
-    this.state.attributes = saved.attributes;
+    this.state.attributes = saved.attributes || { 专业度: 50, 人缘: 50, 体力: 80, 运气: 40 };
     this.state.history = saved.history || [];
     this.state.currentScene = saved.currentScene;
     this.state.screen = 'game';
     this.state.previousScene = null;
     this.state._skipDecay = false;
     this.state.jokeEndingsSeen = saved.jokeEndingsSeen || [];
-    this.state.propertyEndingsSeen = saved.propertyEndingsSeen || [];
-    this.state.careerEndingsSeen = saved.careerEndingsSeen || [];
-    this.state.chapterStats = saved.chapterStats || { goodChoices: 0, badChoices: 0, visitedCrisis: false, visitedHesitation: false };
+    this.state.chapterStats = saved.chapterStats || { goodChoices: 0, badChoices: 0, fatalMistake: false };
     Renderer.showGameScreen();
     this.loadCurrentScene();
   },
@@ -78,29 +77,21 @@ const GameEngine = {
   // ===== 加载场景 =====
   loadCurrentScene() {
     const scene = this.state.chapter.scenes[this.state.currentScene];
-    if (!scene) {
-      console.error('找不到场景:', this.state.currentScene);
-      return;
-    }
-
-    // 体力衰减
+    if (!scene) { console.error('找不到场景:', this.state.currentScene); return; }
     if (this.state.history.length > 0 && !this.state._skipDecay) {
       this.state.attributes.体力 = Math.max(0, this.state.attributes.体力 - 2);
     }
     this.state._skipDecay = false;
-
     Renderer.showScene(scene, this.state.attributes);
   },
 
   // ===== 玩家选择 =====
   choose(index) {
     if (this.state.screen !== 'game') return;
-
     const scene = this.state.chapter.scenes[this.state.currentScene];
     const choice = scene.choices[index];
     if (!choice) return;
 
-    // 记录历史
     this.state.history.push({
       scene: this.state.currentScene,
       sceneTitle: scene.title,
@@ -108,38 +99,39 @@ const GameEngine = {
       choiceText: choice.text,
     });
 
-    // 追踪选择质量
     if (choice.quality === 'good') this.state.chapterStats.goodChoices++;
     if (choice.quality === 'bad') this.state.chapterStats.badChoices++;
 
-    // 追踪是否进入危机场景
-    if (this.state.currentScene === 'scene_hesitation') {
-      this.state.chapterStats.visitedHesitation = true;
-    }
-    if (this.state.currentScene === 'scene_defibrillation' ||
-        this.state.currentScene === 'scene_orders_echo') {
-      this.state.chapterStats.visitedCrisis = true;
-    }
-
-    // 应用属性变化
     if (choice.attr) {
       for (const [key, delta] of Object.entries(choice.attr)) {
-        this.state.attributes[key] = Math.max(
-          0, Math.min(100, this.state.attributes[key] + delta)
-        );
+        this.state.attributes[key] = Math.max(0, Math.min(100, this.state.attributes[key] + delta));
       }
     }
 
-    // 梗结局
+    // 梗结局（可回溯）
     if (choice.jokeEnding) {
       this.state.previousScene = this.state.currentScene;
       this.state.screen = 'jokeEnding';
       if (!this.state.jokeEndingsSeen.includes(choice.jokeEnding)) {
         this.state.jokeEndingsSeen.push(choice.jokeEnding);
       }
-      const ending = Endings.getJokeEnding(choice.jokeEnding);
       Storage.save(this.state);
-      Renderer.showJokeEnding(ending, this.state.jokeEndingsSeen.length);
+      Renderer.showJokeEnding(Endings.getJokeEnding(choice.jokeEnding), this.state.jokeEndingsSeen.length);
+      return;
+    }
+
+    // ★ 致命选项：章节失败结局
+    if (choice.fatalEnding) {
+      this.state.chapterStats.fatalMistake = true;
+      this.state.screen = 'failEnding';
+      this.saveAttributes();
+      Career.recordChapter(this.state.chapterId, {
+        correctChoices: this.state.chapterStats.goodChoices || 0,
+        badChoices: this.state.chapterStats.badChoices || 0,
+        majorMistake: true,
+      });
+      Storage.save(this.state);
+      Renderer.showChapterFailEnding(Endings.getChapterFailEnding(choice.fatalEnding));
       return;
     }
 
@@ -157,7 +149,7 @@ const GameEngine = {
     }
   },
 
-  // ===== 从梗结局返回 =====
+  // ===== 梗结局返回 =====
   returnFromJokeEnding() {
     if (!this.state.previousScene) return;
     this.state.currentScene = this.state.previousScene;
@@ -170,55 +162,64 @@ const GameEngine = {
 
   // ===== 章节结算 =====
   finishChapter() {
+    this.saveAttributes();
+
     const cs = this.state.chapterStats;
+    let outcome = cs.fatalMistake ? 'fatal' : (cs.badChoices >= 2 ? 'nearMiss' : 'success');
+    let majorMistake = cs.fatalMistake;
 
-    // 判断本章结果
-    let outcome;
-    if (cs.visitedHesitation || cs.badChoices >= 3) {
-      outcome = 'nearMiss';  // 犹豫/犯错但最终救回来了
-    } else if (cs.visitedCrisis) {
-      outcome = 'nearMiss';
-    } else if (cs.badChoices === 0 && cs.goodChoices >= 3) {
-      outcome = 'perfect';
-    } else {
-      outcome = 'success';
-    }
-
-    const majorMistake = cs.visitedHesitation && cs.badChoices >= 3;
-
-    Career.recordChapter(this.state.chapter.id, {
-      correctChoices: cs.goodChoices,
-      badChoices: cs.badChoices,
+    Career.recordChapter(this.state.chapterId, {
+      correctChoices: cs.goodChoices || 0,
+      badChoices: cs.badChoices || 0,
       majorMistake: majorMistake,
       nearMiss: outcome === 'nearMiss',
     });
 
-    // 检查职业结局
-    const careerEndingId = Career.checkCareerEnding();
-
-    if (careerEndingId) {
-      if (!this.state.careerEndingsSeen.includes(careerEndingId)) {
-        this.state.careerEndingsSeen.push(careerEndingId);
-      }
-      const ending = Endings.getCareerEnding(careerEndingId);
-      this.state.screen = 'careerEnding';
-      Storage.save(this.state);
-      Renderer.showCareerEnding(ending, Career.getStats());
-    } else {
-      this.state.screen = 'chapterComplete';
-      Storage.save(this.state);
-      Renderer.showChapterComplete(outcome, this.state.attributes, Career.getStats());
+    // 每章结束体力自然衰减（疲劳累积）
+    const careerStats = Career.getStats();
+    const chaptersDone = careerStats.chaptersCompleted.length;
+    if (chaptersDone >= 1) {
+      this.state.attributes.体力 = Math.max(0, this.state.attributes.体力 - 10);
+      this.saveAttributes();
     }
+
+    // 检查累计结局（按优先级）
+    if (this.state.attributes.体力 < 20) {
+      this.state.screen = 'cumulativeEnding';
+      Storage.save(this.state);
+      Renderer.showCumulativeEnding(Endings.getCumulativeEnding('overwork_death'), Career.getStats());
+      return;
+    }
+
+    if (careerStats.reputation < 20) {
+      this.state.screen = 'cumulativeEnding';
+      Storage.save(this.state);
+      Renderer.showCumulativeEnding(Endings.getCumulativeEnding('complaint_fired'), Career.getStats());
+      return;
+    }
+
+    // 晋级检查：成功救治 ≥ 10
+    if (careerStats.patientsSaved >= 10) {
+      this.state.screen = 'promotionEnding';
+      Storage.save(this.state);
+      Renderer.showPromotionEnding(Endings.getPromotionEnding('attending_exam'));
+      return;
+    }
+
+    // 正常章节结算
+    this.state.screen = 'chapterComplete';
+    Storage.save(this.state);
+    Renderer.showChapterComplete(outcome, this.state.attributes, Career.getStats());
   },
 
-  // ===== 获取属性提示 =====
+  // ===== 属性提示 =====
   getAttrHints() {
     const a = this.state.attributes;
     const hints = [];
-    if (a.体力 < 30) hints.push('😵 已经很累了，眼前有些发虚');
-    else if (a.体力 < 50) hints.push('🥱 体力在下降');
+    if (a.体力 < 25) hints.push('😵 你很累了——眼睛发虚，腿在抖');
+    else if (a.体力 < 40) hints.push('🥱 体力在下降');
     if (a.专业度 >= 70) hints.push('📋 临床判断在线');
-    if (a.专业度 <= 25) hints.push('😰 对自己的诊断越来越没信心');
+    if (a.人缘 <= 25) hints.push('😐 你感觉和团队有些疏远');
     return hints;
   },
 };

@@ -181,7 +181,7 @@ const chapter1 = {
       choices: [
         { text: '"抽血查心肌标志物。持续监护。请心内科来会诊。"', next: 'scene_stomach', attr: { 专业度: 8 } },
         { text: '"先观察半小时——看会不会自己缓解。"', next: 'scene_next_delay', attr: { 专业度: -5 } },
-        { text: '"可能是胃病——先按胃病处理看看。"', next: 'scene_next_wrong', attr: { 专业度: -8, 人缘: -3 } },
+        { text: '"可能是胃病——先按胃病处理看看。"', next: 'scene_gastric_fatal' },
         { text: '"应该没什么大事——回家休息，明天再看。"', next: 'scene_next_wrong', attr: { 专业度: -10, 人缘: -5 } },
       ],
     },
@@ -343,6 +343,18 @@ const chapter1 = {
       choices: [
         { text: '"记住了。"', next: 'scene_chapter_end', isChapterEnd: true },
         { text: '"下次——会更好。"', next: 'scene_chapter_end', isChapterEnd: true },
+      ],
+    },
+
+    // ==========================================
+    // 15. 致命：放走心梗病人
+    // ==========================================
+    scene_gastric_fatal: {
+      id: 'scene_gastric_fatal',
+      title: '回家',
+      text: '你开了胃药。病人回家了。\n\n妻子走之前还说了句"谢谢医生——我们先观察看看"。\n\n六小时后——凌晨——120把他送回来。广泛前壁心梗。心源性休克。血压测不到。\n\n他没能撑到天亮。\n\n那张心电图——你当时瞟了一眼就放下了——ST段压低清清楚楚地印在纸上。\n\n你只是没有认真看。\n\n你只是觉得——"他说是胃疼"。',
+      choices: [
+        { text: '你没法再选了。', fatalEnding: 'ch1_gastric_home' },
       ],
     },
 

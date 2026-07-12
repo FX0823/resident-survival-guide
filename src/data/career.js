@@ -10,15 +10,16 @@ const Career = {
   defaultStats() {
     return {
       totalPatients: 0,
-      patientsSaved: 0,       // 正确处理（无重大失误）
-      patientsNearMiss: 0,    // 差点出事（有犹豫/小错但最终救回来了）
-      majorMistakes: 0,       // 重大失误次数（错误选择导致严重后果）
-      totalCorrectChoices: 0, // 所有场景中正确选择的累计
-      totalBadChoices: 0,     // 所有场景中错误选择的累计
-      reputation: 50,         // 0-100
+      patientsSaved: 0,
+      patientsNearMiss: 0,
+      majorMistakes: 0,
+      totalCorrectChoices: 0,
+      totalBadChoices: 0,
+      reputation: 50,
       rank: '规培医生 第一年',
       chaptersCompleted: [],
       careerEndingsSeen: [],
+      attributes: { 专业度: 50, 人缘: 50, 体力: 80, 运气: 40 },
     };
   },
 

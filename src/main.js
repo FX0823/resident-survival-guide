@@ -41,6 +41,13 @@
     }
   });
 
+  // 失败结局 → 返回主菜单
+  dom['btn-fail-menu'].addEventListener('click', () => { Renderer.showTitleScreen(); });
+  // 累计结局 → 返回主菜单
+  dom['btn-cum-menu'].addEventListener('click', () => { Renderer.showTitleScreen(); });
+  // 晋级结局 → 返回主菜单
+  dom['btn-promo-menu'].addEventListener('click', () => { Renderer.showTitleScreen(); });
+
   // 梗结局 → 重新选择
   dom['btn-joke-retry'].addEventListener('click', () => {
     GameEngine.returnFromJokeEnding();

@@ -10,22 +10,22 @@ const Renderer = {
   init() {
     const ids = [
       'title-screen', 'game-screen', 'joke-ending-screen',
-      'property-ending-screen', 'chapter-complete-screen',
-      'career-ending-screen', 'gallery-screen',
+      'chapter-complete-screen', 'gallery-screen',
+      'fail-ending-screen', 'cumulative-ending-screen',
+      'promotion-ending-screen',
       'btn-start', 'btn-continue', 'btn-gallery', 'ch-unlock-hint',
-      'btn-menu', 'btn-joke-retry', 'btn-replay', 'btn-to-gallery',
-      'btn-gallery-back', 'btn-chapter-menu',
-      'btn-career-menu', 'btn-career-gallery',
+      'btn-menu', 'btn-joke-retry', 'btn-gallery-back',
+      'btn-chapter-menu', 'btn-fail-menu', 'btn-cum-menu', 'btn-promo-menu',
       'scene-label', 'scene-text', 'attr-hints', 'choices-container',
       'joke-ending-icon', 'joke-ending-title', 'joke-ending-text',
       'joke-ending-hint', 'joke-ending-progress',
-      'prop-ending-icon', 'prop-ending-title', 'prop-ending-text',
-      'prop-ending-attrs',
       'chapter-outcome-icon', 'chapter-outcome-title',
       'chapter-outcome-text', 'chapter-stats', 'chapter-career',
-      'career-ending-icon', 'career-ending-title',
-      'career-ending-text', 'career-ending-stats',
-      'gallery-joke', 'gallery-property', 'gallery-career',
+      'fail-ending-icon', 'fail-ending-title', 'fail-ending-text',
+      'cum-ending-icon', 'cum-ending-title', 'cum-ending-text',
+      'cum-ending-stats',
+      'promo-ending-icon', 'promo-ending-title', 'promo-ending-text',
+      'gallery-joke', 'gallery-career',
     ];
     for (const id of ids) {
       this.dom[id] = document.getElementById(id);
@@ -35,8 +35,9 @@ const Renderer = {
   // ===== 屏幕切换 =====
   showScreen(screenId) {
     ['title-screen', 'game-screen', 'joke-ending-screen',
-     'property-ending-screen', 'chapter-complete-screen',
-     'career-ending-screen', 'gallery-screen'].forEach(id => {
+     'chapter-complete-screen', 'gallery-screen',
+     'fail-ending-screen', 'cumulative-ending-screen',
+     'promotion-ending-screen'].forEach(id => {
       this.dom[id].classList.add('hidden');
     });
     const target = document.getElementById(screenId);
@@ -159,6 +160,36 @@ const Renderer = {
       </p>`;
 
     this.showScreen('career-ending-screen');
+  },
+
+  // ===== 章节失败结局 =====
+  showChapterFailEnding(ending) {
+    this.dom['fail-ending-icon'].textContent = ending.icon;
+    this.dom['fail-ending-title'].textContent = ending.title;
+    this.dom['fail-ending-text'].textContent = ending.text;
+    this.showScreen('fail-ending-screen');
+  },
+
+  // ===== 累计结局（猝死/被投诉）=====
+  showCumulativeEnding(ending, careerStats) {
+    this.dom['cum-ending-icon'].textContent = ending.icon;
+    this.dom['cum-ending-title'].textContent = ending.title;
+    this.dom['cum-ending-text'].textContent = ending.text;
+    const cs = careerStats;
+    this.dom['cum-ending-stats'].innerHTML =
+      `<p style="font-size:14px;color:var(--text-light);text-align:center;">
+        接诊 ${cs.totalPatients} 人 | 成功 ${cs.patientsSaved}
+        | 声誉 ${cs.reputation} | 体力 ${cs.体力 || 0}
+      </p>`;
+    this.showScreen('cumulative-ending-screen');
+  },
+
+  // ===== 晋级结局 =====
+  showPromotionEnding(ending) {
+    this.dom['promo-ending-icon'].textContent = ending.icon;
+    this.dom['promo-ending-title'].textContent = ending.title;
+    this.dom['promo-ending-text'].textContent = ending.text;
+    this.showScreen('promotion-ending-screen');
   },
 
   // ===== 画廊 =====
