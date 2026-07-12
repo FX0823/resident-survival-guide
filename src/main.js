@@ -9,9 +9,13 @@
 
   const { dom } = Renderer;
 
-  // 开始新游戏
-  dom['btn-new-game'].addEventListener('click', () => {
-    GameEngine.startNewGame();
+  // 章节选择
+  dom['btn-ch1'].addEventListener('click', () => {
+    GameEngine.startChapter('ch1');
+  });
+
+  dom['btn-ch2'].addEventListener('click', () => {
+    GameEngine.startChapter('ch2');
   });
 
   // 继续游戏

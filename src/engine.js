@@ -5,8 +5,15 @@
 
 const GameEngine = {
 
+  // 章节注册表
+  chapters: {
+    ch1: chapter1,
+    ch2: chapter2,
+  },
+
   state: {
     screen: 'title',
+    chapterId: null,
     chapter: null,
     currentScene: null,
     attributes: { 专业度: 50, 人缘: 50, 体力: 80, 运气: 40 },
@@ -16,22 +23,24 @@ const GameEngine = {
     careerEndingsSeen: [],
     previousScene: null,
     _skipDecay: false,
-    // 本章统计
     chapterStats: {
       goodChoices: 0,
       badChoices: 0,
-      visitedCrisis: false,   // 是否经历了可避免的危机场景
+      visitedCrisis: false,
       visitedHesitation: false,
     },
   },
 
-  // ===== 开始新游戏 =====
-  startNewGame() {
+  // ===== 开始指定章节 =====
+  startChapter(chapterId) {
     Career.init();
-    this.state.chapter = chapter1;
+    const ch = this.chapters[chapterId];
+    if (!ch) { console.error('章节不存在:', chapterId); return; }
+    this.state.chapterId = chapterId;
+    this.state.chapter = ch;
     this.state.attributes = { 专业度: 50, 人缘: 50, 体力: 80, 运气: 40 };
     this.state.history = [];
-    this.state.currentScene = this.state.chapter.initialScene;
+    this.state.currentScene = ch.initialScene;
     this.state.screen = 'game';
     this.state.previousScene = null;
     this.state._skipDecay = false;
@@ -45,11 +54,13 @@ const GameEngine = {
   continueGame() {
     const saved = Storage.load();
     if (!saved || !saved.chapterId) {
-      this.startNewGame();
+      this.startChapter('ch1');
       return;
     }
     Career.init();
-    this.state.chapter = chapter1; // 目前只有第一章
+    const ch = this.chapters[saved.chapterId] || chapter1;
+    this.state.chapterId = saved.chapterId;
+    this.state.chapter = ch;
     this.state.attributes = saved.attributes;
     this.state.history = saved.history || [];
     this.state.currentScene = saved.currentScene;

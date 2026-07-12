@@ -12,7 +12,7 @@ const Renderer = {
       'title-screen', 'game-screen', 'joke-ending-screen',
       'property-ending-screen', 'chapter-complete-screen',
       'career-ending-screen', 'gallery-screen',
-      'btn-new-game', 'btn-continue', 'btn-gallery',
+      'btn-ch1', 'btn-ch2', 'btn-continue', 'btn-gallery',
       'btn-menu', 'btn-joke-retry', 'btn-replay', 'btn-to-gallery',
       'btn-gallery-back', 'btn-chapter-menu',
       'btn-career-menu', 'btn-career-gallery',
@@ -58,8 +58,9 @@ const Renderer = {
 
   // ===== 渲染场景 =====
   showScene(scene, attributes) {
-    this.dom['scene-label'].textContent =
-      '第一章 · 胸痛之夜 — ' + scene.title;
+    const chTitle = (GameEngine.state.chapter && GameEngine.state.chapter.title)
+      ? GameEngine.state.chapter.title : '';
+    this.dom['scene-label'].textContent = chTitle + ' — ' + scene.title;
 
     this.dom['scene-text'].textContent = scene.text;
 
