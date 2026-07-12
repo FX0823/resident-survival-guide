@@ -50,8 +50,8 @@ const chapter2 = {
       title: '分诊',
       text: '小林翻开记录——\n\n患者A：男，62岁。主诉"胃痛"。血压138/84。心率88。\n\n患者B：女，34岁。主诉"剧烈头痛伴呕吐"。血压126/78。\n\n"分诊看——两个都没有直接进抢救室的指征。"\n\n你点了点头。分诊只是第一步。你决定自己再问一轮。',
       choices: [
-        { text: '走向老人。"胃不舒服——您详细说说。"', next: 'scene_old_man', attr: { 专业度: 6 } },
-        { text: '走向年轻女人。"头痛——吐了两次？什么时候开始的？"', next: 'scene_young_woman_first', attr: { 专业度: 3 } },
+        { text: '走向老人。"胃不舒服——您详细说说。"', next: 'scene_old_man', attr: { 专业度: 6 }, setFlag: { sawOldManFirst: true } },
+        { text: '走向年轻女人。"头痛——吐了两次？什么时候开始的？"', next: 'scene_young_woman_first', attr: { 专业度: 3 }, setFlag: { sawWomanFirst: true } },
         { text: '站在中间。"两位——各自说一下怎么不舒服。老人家先说。"', next: 'scene_old_man', attr: { 人缘: 3 } },
       ],
     },
@@ -120,9 +120,10 @@ const chapter2 = {
     scene_old_man_ecg_done: {
       id: 'scene_old_man_ecg_done',
       title: '安排',
-      text: '妻子虽然还有点困惑——但点了头。老人被扶去心电图室。\n\n你转身。年轻女人的丈夫已经快站起来了。',
+      text: '妻子虽然还有点困惑——但点了头。老人被扶去心电图室。\n\n护士说大概十分钟出结果。\n\n你趁这个空隙——处理另一个病人。',
       choices: [
-        { text: '"到你了。"走向年轻女人。', next: 'scene_young_woman' },
+        { text: '走向年轻女人。', next: 'scene_young_woman' },
+        { text: '趁这十分钟去倒了杯水。坐了一分钟。然后年轻女人的丈夫站起来了。', next: 'scene_young_woman' },
       ],
     },
 
@@ -172,19 +173,18 @@ const chapter2 = {
     scene_young_woman_ct: {
       id: 'scene_young_woman_ct',
       title: 'CT',
-      text: 'CT安排好了。年轻女人被推去CT室。\n\n这时候小林快步跑过来——\n\n"医生——老人的心电图出来了。你看看。"',
+      text: 'CT安排好了。年轻女人被推去CT室。\n\n你转身看大厅。',
       choices: [
-        { text: '接过心电图纸展开。', next: 'scene_old_man_result' },
+        { text: '去看老人。', next: 'scene_old_man', routeByFlag: { sawOldManFirst: 'scene_old_man_result' } },
       ],
     },
 
     scene_young_treatment: {
       id: 'scene_young_treatment',
       title: '处理',
-      text: '你给女人开了止痛药和止吐药。灯光调暗了。\n\n丈夫还在犹豫——"CT辐射——她以前也犯过——"\n\n这时候小林快步跑过来——"医生——老人的心电图——你看看。"',
+      text: '你给女人开了止痛药和止吐药。灯光调暗了。\n\n丈夫还在犹豫——"CT辐射——她以前也犯过——"\n\n你回头看了一眼大厅。',
       choices: [
-        { text: '"CT的事等一下再说。我先看心电图。"', next: 'scene_old_man_result' },
-        { text: '"你们先考虑——CT随时可以做。我先看另外一个病人的结果。"', next: 'scene_old_man_result' },
+        { text: '老人还在等——去看他。', next: 'scene_old_man', routeByFlag: { sawOldManFirst: 'scene_old_man_result' } },
       ],
     },
 

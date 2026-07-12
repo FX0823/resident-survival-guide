@@ -134,6 +134,14 @@ const GameEngine = {
     if (choice.quality === 'bad') this.state.chapterStats.badChoices++;
     if (choice.setFlag) Object.assign(this.state.pathFlags, choice.setFlag);
 
+    // 标记路由：根据 flag 决定下一个场景
+    let nextScene = choice.next;
+    if (choice.routeByFlag) {
+      for (const [flag, target] of Object.entries(choice.routeByFlag)) {
+        if (this.state.pathFlags[flag]) { nextScene = target; break; }
+      }
+    }
+
     if (choice.attr) {
       for (const [key, delta] of Object.entries(choice.attr)) {
         this.state.attributes[key] = Math.max(0, Math.min(100, this.state.attributes[key] + delta));
@@ -169,8 +177,8 @@ const GameEngine = {
     }
 
     // 正常跳转
-    if (choice.next) {
-      this.state.currentScene = choice.next;
+    if (nextScene) {
+      this.state.currentScene = nextScene;
       Storage.save(this.state);
       this.loadCurrentScene();
     }
