@@ -48,6 +48,10 @@
     }
   });
 
+  // 失败结局 → 重试本章
+  dom['btn-fail-retry'].addEventListener('click', () => {
+    GameEngine.startChapter(GameEngine.state.chapterId || 'ch1');
+  });
   // 失败结局 → 返回主菜单
   dom['btn-fail-menu'].addEventListener('click', () => { Renderer.showTitleScreen(); });
   // 累计结局 → 返回主菜单

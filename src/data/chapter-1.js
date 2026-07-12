@@ -179,10 +179,10 @@ const chapter1 = {
       title: '下一步',
       text: '家属稍微安静了——\n\n"就是先按危险的处理？"\n\n"对。先排最危险的。"\n\n护士在等你的指令。',
       choices: [
-        { text: '"抽血查心肌标志物。持续监护。请心内科来会诊。"', next: 'scene_stomach', attr: { 专业度: 8 } },
-        { text: '"先观察半小时——看会不会自己缓解。"', next: 'scene_next_delay', attr: { 专业度: -5 } },
+        { text: '"抽血查心肌标志物。持续监护。请心内科来会诊。"', next: 'scene_stomach', attr: { 专业度: 8 }, setFlag: { treatment: 'correct' } },
+        { text: '"先观察半小时——看会不会自己缓解。"', next: 'scene_next_delay', attr: { 专业度: -5 }, setFlag: { treatment: 'delay' } },
         { text: '"可能是胃病——先按胃病处理看看。"', next: 'scene_gastric_fatal' },
-        { text: '"应该没什么大事——回家休息，明天再看。"', next: 'scene_next_wrong', attr: { 专业度: -10, 人缘: -5 } },
+        { text: '"应该没什么大事——回家休息，明天再看。"', next: 'scene_next_wrong', attr: { 专业度: -10, 人缘: -5 }, setFlag: { treatment: 'dismiss' } },
       ],
     },
 
@@ -266,9 +266,9 @@ const chapter1 = {
       title: '家属',
       text: '他老婆站在导管室门口。眼睛哭肿了。\n\n"他——他——"\n\n"血管通了。他没事了。"\n\n然后不是感谢——是爆发。\n\n"让他来医院——不来！吃药——三年不吃！嫌我烦！嫌我啰嗦！两个孩子我一个人带！他有没有想过我！"\n\n嚎啕大哭。走廊所有人都看过来。她憋了三年。',
       choices: [
-        { text: '拉把椅子坐她旁边。"阿姨——你辛苦了。"就这几个字。然后听。', next: 'scene_family_warm', attr: { 人缘: 8 } },
-        { text: '"这里是急诊——请冷静。手术成功了。"', next: 'scene_family_cold', attr: { 人缘: -5 } },
-        { text: '"手术很成功。具体心内科会跟您说。"转过身走了。', next: 'scene_family_go', attr: { 人缘: -2 } },
+        { text: '拉把椅子坐她旁边。"阿姨——你辛苦了。"就这几个字。然后听。', next: 'scene_family_warm', attr: { 人缘: 8 }, setFlag: { handledWife: 'warm' } },
+        { text: '"这里是急诊——请冷静。手术成功了。"', next: 'scene_family_cold', attr: { 人缘: -5 }, setFlag: { handledWife: 'cold' } },
+        { text: '"手术很成功。具体心内科会跟您说。"转过身走了。', next: 'scene_family_go', attr: { 人缘: -2 }, setFlag: { handledWife: 'neutral' } },
       ],
     },
 
@@ -307,7 +307,7 @@ const chapter1 = {
       title: '谢意',
       text: '她擦干脸后从CCU回来了。脸上有了血色——还挤出一个不好意思的笑。\n\n"医生——刚才太不好意思了——这个是给你的——"\n\n塑料袋。金黄色大芒果。',
       choices: [
-        { text: '接过芒果。你还没学过急诊科的水果禁忌。', jokeEnding: 'mango' },
+        { text: '接过芒果。', jokeEnding: 'mango' },
         { text: '"阿姨——芒果留给叔叔。您以后盯着他把烟戒了——就是对我最好的感谢。"', next: 'scene_debrief', attr: { 人缘: 3, 运气: 5 } },
       ],
     },
@@ -339,7 +339,8 @@ const chapter1 = {
     scene_debrief_content: {
       id: 'scene_debrief_content',
       title: '教',
-      text: '"今天几个要点。\n\n第一：胸痛——第一件事永远是心电图。十几块钱。心肌坏死的速度按分钟算。你早一分钟通血管，他就多一块活着的心脏。\n\n第二：病人说\'闷\'、\'压\'、\'左胳膊酸\'、\'下巴难受\'——自己说不清楚——但你要能捞出来。\n\n第三：家属。病人不说真话——家属说。病人不肯来——家属拖他来。\n\n第四：病人会说自己是胃病。你要能分辨。\n\n第五——"他站起来，"今天做得不错。但记住：每个病人都不一样。下一个可能更不配合、更危重。做医生——别飘。"',
+      dynamic: true,
+      baseText: '"今天几个要点。\n\n第一：胸痛——第一件事永远是心电图。十几块钱。心肌坏死的速度按分钟算。你早一分钟通血管，他就多一块活着的心脏。\n\n第二：病人说\'闷\'、\'压\'、\'左胳膊酸\'、\'下巴难受\'——自己说不清楚——但你要能捞出来。\n\n第三：家属。病人不说真话——家属说。病人不肯来——家属拖他来。\n\n第四：病人会说自己是胃病。你要能分辨。\n\n第五——"他站起来，"今天做得不错。但记住：每个病人都不一样。下一个可能更不配合、更危重。做医生——别飘。"',
       choices: [
         { text: '"记住了。"', next: 'scene_chapter_end', isChapterEnd: true },
         { text: '"下次——会更好。"', next: 'scene_chapter_end', isChapterEnd: true },

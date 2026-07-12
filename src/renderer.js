@@ -15,7 +15,7 @@ const Renderer = {
       'promotion-ending-screen',
       'btn-start', 'btn-continue', 'btn-gallery', 'ch-unlock-hint', 'btn-reset',
       'btn-menu', 'btn-joke-retry', 'btn-gallery-back',
-      'btn-chapter-menu', 'btn-fail-menu', 'btn-cum-menu', 'btn-promo-menu',
+      'btn-chapter-menu', 'btn-fail-retry', 'btn-fail-menu', 'btn-cum-menu', 'btn-promo-menu',
       'scene-label', 'scene-text', 'attr-hints', 'choices-container',
       'joke-ending-icon', 'joke-ending-title', 'joke-ending-text',
       'joke-ending-hint', 'joke-ending-progress',

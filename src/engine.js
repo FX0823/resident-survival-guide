@@ -17,6 +17,8 @@ const GameEngine = {
     previousScene: null,
     _skipDecay: false,
     chapterStats: { goodChoices: 0, badChoices: 0, fatalMistake: false },
+    // 路径标记：不同选择留下印记，后续场景根据标记显示不同内容
+    pathFlags: {},
   },
 
   // ===== 从 career 加载跨章属性 =====
@@ -49,6 +51,7 @@ const GameEngine = {
     this.state.previousScene = null;
     this.state._skipDecay = false;
     this.state.chapterStats = { goodChoices: 0, badChoices: 0, fatalMistake: false };
+    this.state.pathFlags = {};
     this._finishChapterCalled = false;
     Storage.save(this.state);
     Renderer.showGameScreen();
@@ -80,7 +83,37 @@ const GameEngine = {
     const scene = this.state.chapter.scenes[this.state.currentScene];
     if (!scene) { console.error('找不到场景:', this.state.currentScene); return; }
     this.state._skipDecay = false;
+    // 动态场景：根据 pathFlags 生成文本
+    if (scene.dynamic) {
+      const dynamicScene = this.buildDynamicScene(scene);
+      Renderer.showScene(dynamicScene, this.state.attributes);
+      return;
+    }
+
     Renderer.showScene(scene, this.state.attributes);
+  },
+
+  // ===== 动态场景生成（根据路径标记）=====
+  buildDynamicScene(scene) {
+    const f = this.state.pathFlags;
+    let text = scene.baseText || scene.text;
+
+    // 第一章：胸痛复盘
+    if (scene.id === 'scene_debrief_content') {
+      if (f.handledWife === 'warm') {
+        text += '\n\n"另外——你跟家属的沟通——今天做得很好。那个病人的老婆后来跟林姐说——她说那个小医生让她觉得被听见了。这种事——教科书上不教。但你做到了。"';
+      } else if (f.handledWife === 'cold') {
+        text += '\n\n"还有一件事——家属。你今天跟那个病人老婆的沟通——差点被投诉。急诊科——家属有时候比病人更需要你。下次——多听两句，少说两句。"';
+      }
+
+      if (f.treatment === 'delay') {
+        text += '\n\n"你今天在治疗上犹豫了——心电图出来了还在等。记住——心肌坏死的速度是按分钟算的。宁可多做——不能少做。"';
+      } else if (f.treatment === 'correct') {
+        text += '\n\n"治疗方向选对了——及时抽血、请会诊、走流程。这就是标准路径——没什么花哨——但管用。"';
+      }
+    }
+
+    return Object.assign({}, scene, { text: text });
   },
 
   // ===== 玩家选择 =====
@@ -99,6 +132,7 @@ const GameEngine = {
 
     if (choice.quality === 'good') this.state.chapterStats.goodChoices++;
     if (choice.quality === 'bad') this.state.chapterStats.badChoices++;
+    if (choice.setFlag) Object.assign(this.state.pathFlags, choice.setFlag);
 
     if (choice.attr) {
       for (const [key, delta] of Object.entries(choice.attr)) {
