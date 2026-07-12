@@ -48,6 +48,10 @@
     }
   });
 
+  // 重玩章节选择
+  dom['btn-replay-ch1'].addEventListener('click', () => { GameEngine.startChapter('ch1'); });
+  dom['btn-replay-ch2'].addEventListener('click', () => { GameEngine.startChapter('ch2'); });
+
   // 失败结局 → 重试本章
   dom['btn-fail-retry'].addEventListener('click', () => {
     GameEngine.startChapter(GameEngine.state.chapterId || 'ch1');

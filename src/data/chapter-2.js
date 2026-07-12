@@ -102,6 +102,16 @@ const chapter2 = {
       ],
     },
 
+    // === 老人心电图结果 ===
+    scene_old_man_result: {
+      id: 'scene_old_man_result',
+      title: '老人结果',
+      text: '小林快步走过来——\n\n"医生——老人的心电图出来了。你看看。"\n\n你展开心电图纸。ST段压低。多导联。\n\n结合62岁、上腹痛、活动后胸闷——急性冠脉综合征不能排除。\n\n老人妻子盯着你的表情。"严重吗？"\n\n"心电图有问题——不是胃。是心脏。但他现在在医院、发现得早——这是好事。需要抽血查心肌标志物、动态复查心电图、请心内科会诊。"\n\n她愣了两秒。重复了一遍——"他一直说是胃……"\n\n"我知道。但有时候心脏问题不按典型方式表现。他说的胃疼——其实是心脏在求救。"\n\n妻子沉默了一下。然后点了点头。"那你该怎么治就怎么治。"\n\n你安排启动胸痛流程。老人被转去留观区。',
+      choices: [
+        { text: '年轻女人那边——CT该回来了。', next: 'scene_results_explain' },
+      ],
+    },
+
     // === 致命路径：放走老人 ===
     scene_old_man_sent_home: {
       id: 'scene_old_man_sent_home',
@@ -138,9 +148,9 @@ const chapter2 = {
     scene_young_woman_ct: {
       id: 'scene_young_woman_ct',
       title: 'CT',
-      text: 'CT安排好了。\n\n这时候老人的心电图回来了——小林快步跑过来。"医生——老人的心电图——你看看。"',
+      text: 'CT安排好了。年轻女人被推去CT室。\n\n这时候小林快步跑过来——\n\n"医生——老人的心电图出来了。你看看。"',
       choices: [
-        { text: '接过心电图纸展开。', next: 'scene_ecg_result' },
+        { text: '接过心电图纸展开。', next: 'scene_old_man_result' },
       ],
     },
 
@@ -149,8 +159,8 @@ const chapter2 = {
       title: '处理',
       text: '你给女人开了止痛药和止吐药。灯光调暗了。\n\n丈夫还在犹豫——"CT辐射——她以前也犯过——"\n\n这时候小林快步跑过来——"医生——老人的心电图——你看看。"',
       choices: [
-        { text: '"CT的事等一下再说。我先看心电图。"', next: 'scene_ecg_result' },
-        { text: '"你们先考虑——CT随时可以做。我先看另外一个病人的结果。"', next: 'scene_ecg_result' },
+        { text: '"CT的事等一下再说。我先看心电图。"', next: 'scene_old_man_result' },
+        { text: '"你们先考虑——CT随时可以做。我先看另外一个病人的结果。"', next: 'scene_old_man_result' },
       ],
     },
 
@@ -164,23 +174,11 @@ const chapter2 = {
       ],
     },
 
-    // === 10. 选择点：心电图结果 ===
-    scene_ecg_result: {
-      id: 'scene_ecg_result',
-      title: '结果',
-      text: 'ST段压低。多导联。\n\n急性冠脉综合征不能排除。\n\n老人妻子盯着你的脸——\n\n"医生——严重吗？"\n\n年轻女人的丈夫也从旁边看过来了。',
-      choices: [
-        { text: '"心电图有问题——不是胃。是心脏。但他现在在医院、发现得早——这是好事。"', next: 'scene_results_explain', attr: { 专业度: 5, 人缘: 5 } },
-        { text: '"心电图不正常。需要抽血进一步查——可能是心脏的问题。"', next: 'scene_results_explain', attr: { 专业度: 4, 人缘: 2 } },
-        { text: '"先抽血查心肌标志物再说。"', next: 'scene_results_explain', attr: { 人缘: -1 } },
-      ],
-    },
-
-    // === 11. 结果 ===
+    // === 10. 双人收束 ===
     scene_results_explain: {
       id: 'scene_results_explain',
       title: '收束',
-      text: '老人被安排留观——启动胸痛流程。心肌标志物、动态心电图、心内科会诊。\n\n年轻女人的CT也回来了——未见异常。偏头痛急性发作。止痛处理后明显好转。\n\n两个人都稳住了。\n\n老人妻子走过来——\n\n"医生——谢谢你。一开始我还觉得你搞错了……"\n\n你还没回答——小林又过来了。\n\n"医生——大厅又来了一个。腹痛的。"',
+      text: '老人的胸痛流程已启动——心肌标志物、心内科会诊、留观。\n\n年轻女人的CT也回来了——未见异常。偏头痛急性发作。止痛处理后明显好转。\n\n两个人都稳住了。\n\n老人妻子走过来——\n\n"医生——谢谢你。一开始我还觉得你搞错了……"\n\n你还没回答——小林又过来了。\n\n"医生——大厅又来了一个。腹痛的。"',
       choices: [
         { text: '"让分诊先看。我歇五分钟。"你靠在椅背上——眼睛闭上了。', next: 'scene_rest_choice', attr: { 体力: 8, 人缘: -3 } },
         { text: '"好。让他进来吧。"你站起来。腿在抖。', next: 'scene_debrief', attr: { 体力: -3, 人缘: 3 } },

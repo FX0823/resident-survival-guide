@@ -14,6 +14,7 @@ const Renderer = {
       'fail-ending-screen', 'cumulative-ending-screen',
       'promotion-ending-screen',
       'btn-start', 'btn-continue', 'btn-gallery', 'ch-unlock-hint', 'btn-reset',
+      'ch-select', 'btn-replay-ch1', 'btn-replay-ch2',
       'btn-menu', 'btn-joke-retry', 'btn-gallery-back',
       'btn-chapter-menu', 'btn-fail-retry', 'btn-fail-menu', 'btn-cum-menu', 'btn-promo-menu',
       'scene-label', 'scene-text', 'attr-hints', 'choices-container',
@@ -57,13 +58,18 @@ const Renderer = {
     const done = Career.getStats().chaptersCompleted || [];
     if (done.length === 0) {
       this.dom['ch-unlock-hint'].textContent = '';
+      this.dom['btn-start'].classList.remove('hidden');
+      this.dom['ch-select'].classList.add('hidden');
       this.dom['btn-start'].textContent = '开始游戏';
     } else if (done.includes('ch1') && !done.includes('ch2')) {
       this.dom['ch-unlock-hint'].textContent = '✅ 第一章已通过 — 第二章已解锁';
+      this.dom['btn-start'].classList.remove('hidden');
+      this.dom['ch-select'].classList.add('hidden');
       this.dom['btn-start'].textContent = '开始第二章';
     } else if (done.includes('ch2')) {
-      this.dom['ch-unlock-hint'].textContent = '✅ 全部通关';
-      this.dom['btn-start'].textContent = '重新开始';
+      this.dom['ch-unlock-hint'].textContent = '✅ 全部通关 — 选择章节重玩';
+      this.dom['btn-start'].classList.add('hidden');
+      this.dom['ch-select'].classList.remove('hidden');
     }
   },
 
